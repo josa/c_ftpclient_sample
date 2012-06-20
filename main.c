@@ -13,6 +13,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define FTP_SUCCESS = 1;
+#define FTP_ERROR = 0;
+
 static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *stream){
   curl_off_t nread;
   
@@ -24,6 +27,9 @@ static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *stream){
   
   return retcode;
 }
+
+
+
 
 int main(int argc, char** argv) {
 
