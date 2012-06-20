@@ -66,17 +66,21 @@ int main(int argc, char** argv) {
         curl_easy_setopt(curl, CURLOPT_POSTQUOTE, headerList);
         curl_easy_setopt(curl, CURLOPT_READDATA, localFile);
         curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, fileSize);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15);
         
         res = curl_easy_perform(curl);
         
-        if(res == CURLE_UPLOAD_FAILED){
+        if(res == CURLE_OK){
+            printf("file uploaded successfully");
+        }else if(res == CURLE_UPLOAD_FAILED){
             printf("Error: upload failed");
-        }
-        
-        
+        }else if(res == CURLE_LOGIN_DENIED){
+             printf("Error: access denied");
+        }else if(res == CURLE_RECV_ERROR){
+             printf("Error: ocorreu um erro");
+        }else if(res == CURLE_OPERATION_TIMEDOUT);
         
         curl_slist_free_all(headerList);
-        
         curl_easy_cleanup(curl);
         
     }else{
