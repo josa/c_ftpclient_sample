@@ -29,6 +29,12 @@ void test2() {
     CU_ASSERT(2 * 2 == 5);
 }
 
+void testGetNameFile(){
+   char name = getNameFile("/bla/foo/test.tar.gz");
+   printf(name);
+   CU_ASSERT_STRING_EQUAL(name, "test.tar.gz");
+}
+
 int main() {
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
@@ -42,7 +48,8 @@ int main() {
 
     /* Add the tests to the suite */
     if ((NULL == CU_add_test(pSuite, "test1", test1)) ||
-            (NULL == CU_add_test(pSuite, "test2", test2))) {
+        //(NULL == CU_add_test(pSuite, "test2", test2)) ||
+        (NULL == CU_add_test(pSuite, "testGetNameFile", testGetNameFile)) ) {
         CU_cleanup_registry();
         return CU_get_error();
     }

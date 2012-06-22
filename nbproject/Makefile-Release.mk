@@ -77,15 +77,15 @@ ${OBJECTDIR}/main.o: main.c
 
 # Build Test Targets
 .build-tests-conf: .build-conf ${TESTFILES}
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ftpclient: ${TESTDIR}/curl/tests/newcunittest.o ${OBJECTFILES:%.o=%_nomain.o}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ftpclient: ${TESTDIR}/tests/c_ftp_client_test.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c}   -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ftpclient $^ ${LDLIBSOPTIONS} 
 
 
-${TESTDIR}/curl/tests/newcunittest.o: curl/tests/newcunittest.c 
-	${MKDIR} -p ${TESTDIR}/curl/tests
+${TESTDIR}/tests/c_ftp_client_test.o: tests/c_ftp_client_test.c 
+	${MKDIR} -p ${TESTDIR}/tests
 	${RM} $@.d
-	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${TESTDIR}/curl/tests/newcunittest.o curl/tests/newcunittest.c
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${TESTDIR}/tests/c_ftp_client_test.o tests/c_ftp_client_test.c
 
 
 ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.c 

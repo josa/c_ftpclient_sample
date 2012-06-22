@@ -1,10 +1,3 @@
-/* 
- * File:   main.c
- * Author: jgalvao
- *
- * Created on June 19, 2012, 5:27 PM
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +5,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 
 static const int FTP_SUCCESS = 1;
 static const int FTP_ERROR = 0;
@@ -28,45 +22,40 @@ static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *stream){
   return retcode;
 }
 
-int ftpPut(CURL *curl, char *filePath){
+int ftpPut(char *filePath){
     
-    
-    
-    return FTP_SUCCESS;
-}
-
-
-int main(int argc, char** argv) {
-
     CURL *curl;
     CURLcode res;
     FILE *localFile;
     struct stat fileStat;
     curl_off_t fileSize;
     
+    char *putcommand = "RNFR ";
+    char *fileName = malloc(1);
+    parseFileName(filePath, fileName);
+    
+    char *cmdPrefix = "RNFR";
+    const char putCmd[sizeof(cmdPrefix) + sizeof(fileName)];
+    sprintf(putCmd, "%s %s", cmdPrefix, fileName);   
+    
     struct curl_slist *headerList = NULL;
-    static const char buf1[] = "RNFR bootstrap.zip";
-    static const char buf2[] = "RNTO bootstrap-renamed.zip";
-        
-    char *localFilePath = "/home/jgalvao/Downloads/bootstrap.zip";
-    if(stat(localFilePath, &fileStat)){
-        printf("error, file not found: %s", localFilePath, strerror(errno));
+    
+    if(stat(filePath, &fileStat)){
+        printf("error, file not found: %s", filePath, strerror(errno));
         return EXIT_FAILURE;
     }
     
-    //Recupera o tamanho o arquivo em bytes
     fileSize = (curl_off_t)fileStat.st_size;
     printf("Local file size: %" "ld" "bytes.\n", fileSize);
-            
-    localFile = fopen(localFilePath, "rb");
     
+    localFile = fopen(filePath, "rb");
+    
+    //TODO: move it
     curl_global_init(CURL_GLOBAL_ALL);
-    
     curl = curl_easy_init();
     
     if(curl){
-        headerList = curl_slist_append(headerList, buf1);
-        headerList = curl_slist_append(headerList, buf2);
+        headerList = curl_slist_append(headerList, putCmd);
         
         curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
@@ -93,13 +82,42 @@ int main(int argc, char** argv) {
         
         curl_slist_free_all(headerList);
         curl_easy_cleanup(curl);
-        
-    }else{
-        printf("Error: cURL not initialized");
     }
     
-    fclose(localFile);
-    curl_global_cleanup();
+    //Free pointers
+    free(fileName);
     
-    return (EXIT_SUCCESS);
+    return FTP_SUCCESS;
+}
+
+void parseFileName(char *filePath, char *filename){
+    int i, len = strlen(filePath);
+    char path[len];
+    char *tmpToken;
+    
+    for(i=0; i<=len; i++) 
+        path[i] = *(filePath+i);
+    
+    tmpToken = strtok(path, "/");
+    while(NULL != tmpToken){
+        len = strlen(tmpToken);
+        if(NULL == realloc(filename, len+1)){
+            printf("%s", "out of memory");
+            exit(0);
+        }
+        
+        for(i=0; i<=len; i++)
+            *(filename+i) = *(tmpToken+i);
+        
+        tmpToken = NULL;
+        tmpToken = strtok(NULL, "/");
+    }
+    free(tmpToken);
+    tmpToken = NULL;
+}
+
+int main(int argc, char** argv) {
+
+    return EXIT_SUCCESS;
+
 }
